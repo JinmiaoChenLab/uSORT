@@ -1,39 +1,46 @@
 #' uSort: A self-refining ordering pipeline for gene selection
 #'
 #' This package is designed to uncover the intrinsic cell progression path
-#' from single-cell RNA-seq data. 
+#' from single-cell RNA-seq data.
 #'
 #' This package incorporates data pre-processing, preliminary PCA gene selection, preliminary
 #' cell ordering, feature selection, refined cell ordering, and post-analysis interpretation
 #' and visualization. The uSort workflow can be implemented through calling the main function
-#' \code{\link{uSort_main}}.
+#' \code{\link{uSort}}.
 #'
 #' @docType package
 #' @name uSort
 #'
 NULL
 
-#' A main function of uSort
+
+#' The main function of uSort pacakge
 #'
-#' A main function of uSort \code{uSort_main} which provides a workflow of sorting scRNA-seq data,
-#' including data preprocess with merging methods of multiple fcs file, logicle transformation,
-#' dimension reduction with PCA, isomap or tsne(default), and a kernal-based local maxima
-#' clustering combined with SVM for subpopulation detection. The intermediate results can be saved
-#' into seperate files and the cluster results can be visualized in heatmaps and scatter plots.
+#' The main function of \code{uSort-pacakge} which provides a workflow of sorting scRNA-seq data.
 #'
-#' @param resDir the directory to which output results will be written
-#' @param exprsFile a character of input expression filename
-# @param no_component number of principal components used for preliminary gene selection
-#' @param exp.outlier.removed a EXP object of preprocessed expression data
-#' @param driving.force.cutoff a value used for removing genes which do not
-#' change much along cell progress
-#' @param data_type a character indicating the type of underlying cell progression, 
-#' i.e. linear or cyclical
-#' @param qval_cutoff_featureselection a user-defined adjusted p-value below which
-#' genes are selected for driver gene selection
-#' @return a matrix \code{res} of the permutated norm_exprs. If choose 'writeResults = TRUE', results
-#' will be saved into files under \code{resDir}
+#' @param result_directory the directory to which output results will be written
+#' @param data_type a character indicating the type of underlying cell progression, i.e. linear or cyclical
+#' @param exprs_data
+#' @param if_preprocess
+#' @param preliminary_sort_method
+#' @param refine_sort_method
+#' @param scattering_cutoff_prob
+#' @param driving_force_cutoff
+#' @param sorting_method
+#' @param alpha
+#' @param sigma_width
+#' @param no_randomization
+#' @param diffusionmap_components
+#' @param l
+#' @param k
+#' @param num_waypoints
+#' @param waypoints_seed
+#' @param qval_cutoff_featureSelection a user-defined adjusted p-value below which genes are selected for driver gene selection
+#'
+#' @return a matrix \code{res} of the permutated norm_exprs. If choose 'writeResults = TRUE', results will be saved into files under \code{result_directory}
+#'
 #' @author MaiChan Lau
+#'
 #' @import fluidigmSC
 #' @import monocle
 #' @importFrom gplots heatmap.2
@@ -41,201 +48,287 @@ NULL
 #' @importFrom ggplot2 ggsave
 #' @importFrom VGAM sm.ns
 #' @export
+uSort <- function(exprs_data,
+                  if_preprocess = TRUE,
+                  preliminary_sort_method = c("autoSPIN, sWanderlust, monocle, SPIN"),
+                  refine_sort_method = c("autoSPIN, sWanderlust, monocle, SPIN"),
+                  result_directory = file.path(exprs_data),
+                  # gene selection parameters
+                  scattering_cutoff_prob = 0.75,
+                  driving_force_cutoff = NULL,
+                  qval_cutoff_featureSelection = 0.05,
+                  # autoSPIN parameters
+                  data_type = c("linear", "cyclical"),
+                  sorting_method = c("STS", "neighborhood"),
+                  alpha = 0.2,
+                  sigma_width = 1,
+                  no_randomization = 10,
+                  # Wanderlust parameters
+                  diffusionmap_components = 4,
+                  l=15, k=15,
+                  num_waypoints = 150,
+                  waypoints_seed = 2711){
 
-uSort_main<-function(resDir = NULL, exprsFile = NULL,scattering.cutoff.prob=0.75, 
-                     exp.outlier.removed = NULL, driving.force.cutoff = NULL,
-                     data_type = NULL, 
-                     qval_cutoff_featureselection = 0.05, sigma_width = 1,
-                     sorting_method = NULL, no_randomization = NULL,
-                     alpha=NULL){
-    ## =====Inputs check==========
-    preprocess_flag=FALSE
-    if(is.null(exp.outlier.removed)){
-        
-        if(is.null(exprsFile)) stop("No exprs file selected!")
-        else
-            #exprs <- read.table(exprsFile, row.names=1, header = TRUE)
-            preprocess_flag <- TRUE
-        
-    }
-    else exp_noOutlier <- exp.outlier.removed
-    
-    if(is.null(resDir)) stop("No output directory selected")
-    
-    ## =====Modify some fluidigmSC's functions==========
-    assignInNamespace("itn_isSubSetIgnoreCase",itn_isSubSetIgnoreCase,ns="fluidigmSC",, envir=as.environment("package:fluidigmSC"))
-    assignInNamespace("itn_getMatchingOriginalName",itn_getMatchingOriginalName,ns="fluidigmSC")
-    assignInNamespace("itn_anova_by_factor",itn_anova_by_factor,ns="fluidigmSC")
-    assignInNamespace("identifyOutliers",identifyOutliers,ns="fluidigmSC")
-    assignInNamespace("itn_displayOutlierGUI",itn_displayOutlierGUI,ns="fluidigmSC")
-    assignInNamespace("itn_ScatterPlot",itn_ScatterPlot,ns="fluidigmSC")
-    assignInNamespace("itn_saveData",itn_saveData,ns="fluidigmSC")
-    
-    
-    ## =====Pre-processing==========
-    setwd(resDir)
-    if(preprocess_flag == TRUE) exp_noOutlier <- fluidigmSC::identifyOutliers(exprsFile)
-    exp_trimmed <- pre_processing(exp_noOutlier)
-    cat('\nOriginal data: no. of genes = ', nrow(exp_trimmed$org_data),
-        '\t no. of samples = ', ncol(exp_trimmed$org_data),'\n')
-    cat('After SINGuLAR pre-processing: no. of genes = ', nrow(exp_trimmed$gene_list),
-        '\t no. of samples = ', nrow(exp_trimmed$sample_list),'\n')
-    save_title <- 'preprocessed_exp'
-    saved_filename <- itn_saveData(exp_trimmed, 
-                                   save_title = save_title, init_filename = save_title)
+    ## Parameter check
+    preliminary_sort_method <- match.arg(preliminary_sort_method)
+    refine_sort_method <- match.arg(refine_sort_method)
+    data_type <- match.arg(data_type)
+    sorting_method <- match.arg(sorting_method)
+    fluidigmSC_functions_update()
+    if(!dir.exists(result_directory))
+        dir.create(result_directory)
+    setwd(result_directory)
 
-    ## =====Preliminary gene selection using PCA==========
-    pca_res<-prcomp(as.matrix(t(exp_trimmed$log2ex_data)))
-    eigenVal <- pca_res$sdev^2
-    eigenVal <- data.frame('PC'=seq(length(eigenVal)),'Score'=eigenVal)
-    opt_PC <- elbow_detection(scores = eigenVal, xlab.text='PC#',
-                                 ylab.text = 'Variance',
-                                 baseNm = 'optimal_number_of_PC')
-    
-    no_component <- nrow(opt_PC)   
-    cat('No. of PC selected = ', no_component,'\n')
-    PC1.to.X<-as.data.frame(abs(pca_res$rotation[,1:no_component,drop=F]))
-    # sum of PCs
-    PC1.to.X$total<-rowSums(PC1.to.X[,1:no_component,drop=F])
+    ## Data loading and pre-processing
+    exp_trimmed <- uSort_preProcess(exprsData, preProcess = TRUE)
+    saved_filename <- itn_saveData(exp_trimmed,
+                                   save_title = 'preprocessed_exp',
+                                   init_filename = 'preprocessed_exp')
 
-    PC1.to.X<-PC1.to.X[,-c(1:no_component),drop=F]
-    sorted_PC1.to.X<-PC1.to.X[order(PC1.to.X[,1],decreasing=T),,drop=F]
-    pca <- data.frame('GeneID'=rownames(sorted_PC1.to.X),'Score'=sorted_PC1.to.X$total)
-    PCA_genes <- elbow_detection(scores = pca, baseNm = 'PCA.gene.selection',
-                                 ylab.text = paste0('Sum of (abs)PC1-',no_component,' loadings'), 
-                                 xlab.text= 'Gene#')
 
-    # The top 100 pca genes
-    #PCA_genes <- pca[1:100,'GeneID',drop=FALSE]
+    ## Preliminary gene selection using PCA
+    pca_res <- prcomp(as.matrix(t(exp_trimmed$log2ex_data)))
+    eigenVal <- pca_res$sdev ^ 2
+    eigenVal <- data.frame('PC' = seq(length(eigenVal)), 'Score' = eigenVal)
+    opt_PC <- elbow_detection(scores = eigenVal,
+                              xlab.text = 'PC#',
+                              ylab.text = 'Variance',
+                              baseNm = 'optimal_number_of_PC')
+    pca_conmpnent_number <- nrow(opt_PC)
+    cat('No. of PC selected = ', no_component, '\n')
+    rotation_matrix <- as.data.frame(abs(pca_res$rotation[, 1:no_component, drop = FALSE]))
+    rotation_pc_sums <- rowSums(rotation_matrix)
+    sum_order <- order(rotation_pc_sums, decreasing = TRUE)
+    gene_score <- data.frame('GeneID' = names(rotation_pc_sums)[sum_order],
+                             'Score'  = rotation_pc_sums[sum_order])
+    PCA_genes <- elbow_detection(scores = gene_score,
+                                 baseNm = 'PCA.gene.selection',
+                                 ylab.text = paste0('Sum of (abs)PC1-', no_component, ' loadings'),
+                                 xlab.text = 'Gene#')
     colnames(PCA_genes) <- 'GeneID'
-    #pca <- PCA(exp_trimmed, display_plots = FALSE)
-    #PCA_genes <- fldm_pca$pca_ranked_genes[seq(100),'GeneID',drop=FALSE]
-    
-    cat('no. of pca genes = ', nrow(PCA_genes),'\n')  
-    write.table(PCA_genes,file='pca.genes.txt',row.names = F, col.names = T, quote=T, sep='\t')
+    cat('no. of PCA genes = ', nrow(PCA_genes), '\n')
+    write.table(PCA_genes, file = 'pca_genes.txt', row.names = F,
+                col.names = T, quote = T, sep = '\t')
 
-    #PCA_genes<-read.table('../commonPCAgenes_run1n16n17n18.txt', header = T)
-    ## =====Preliminary uSort sorting==========
-    exp.PCA.genes <- fluidigmSC::updateGeneListFromList(exp_trimmed, PCA_genes)
+    ## Preliminary uSort sorting
+    exp_PCA_genes <- updateGeneListFromList(exp_trimmed, PCA_genes)
     cat('\nPreliminary sorting:\n')
-    preliminary.ordering <- sorting_wrapper(t(exp.PCA.genes$log2ex_data), local_sort=T, sorting_method = sorting_method,
-                                            baseNm = 'preliminary', sigma_width=sigma_width,
-                                            no_randomization=no_randomization, data_type=data_type,
-                                            alpha=alpha)
-    exp.preliminary.ordering <- updateSampleListFromList(exp_trimmed, preliminary.ordering)
-    write.table(exp.preliminary.ordering$sample_list,file='preliminary.ordering.txt',row.names = F, col.names = T, quote=T, sep='\t')
-    
+    preliminary_ordering <- sorting_wraper(exp_PCA_genes,
+                                           data_type = data_type,
+                                           method = preliminary_sort_method,
+                                           local_sort = T,
+                                           sorting_method = sorting_method,
+                                           sigma_width = sigma_width,
+                                           no_randomization = no_randomization,
+                                           data_type = data_type,
+                                           alpha = alpha)
+    exp_preliminary_ordering <- updateSampleListFromList(exp_trimmed, preliminary_ordering)
+    write.table(exp_preliminary_ordering$sample_list,
+                file = 'preliminary_ordering.txt',
+                row.names = F,
+                col.names = T,
+                quote = T,
+                sep = '\t')
+
+
     ## Plot cell-to-cell distance heatmap
-    exp.PCA.genes <- updateSampleListFromList(exp.PCA.genes,preliminary.ordering)
-    c2c.dist<-distance.function(t(exp.PCA.genes$log2ex_data))
+    exp_PCA_genes <- updateSampleListFromList(exp_PCA_genes, preliminary_ordering)
+    c2c.dist <- distance.function(t(exp_PCA_genes$log2ex_data))
     pdf('C2C.distHeatmap_preliminary.pdf')
-    col<-gplots::colorpanel( 10, "red", "yellow", "blue" )
-    gplots::heatmap.2(c2c.dist,dendrogram='none',trace='none',col=col,
-                      Rowv=F,Colv=F,labCol=NA ,labRow=NA ,keysize=1.2,
-                      cexRow =1.1,
-                      main=paste('Cell to cell distance \ncomputed on ',nrow(PCA_genes), ' genes'))
+    col <- gplots::colorpanel(10, "red", "yellow", "blue")
+    gplots::heatmap.2(c2c.dist,
+                      dendrogram = 'none',
+                      trace = 'none',
+                      col = col,
+                      Rowv = F,
+                      Colv = F,
+                      labCol = NA ,
+                      labRow = NA ,
+                      keysize = 1.2,
+                      cexRow = 1.1,
+                      main = paste('Cell to cell distance \ncomputed on ',
+                                   nrow(PCA_genes), ' genes'))
     dev.off()
-    
-    ## =====Select driver genes for refined sorting==========
-    cds <- EXP_to_CellDataSet(EXP = exp.preliminary.ordering)
-    driver.genes.refined.sorting <- feature_selection(cds = cds, scattering.cutoff.prob = scattering.cutoff.prob, driving.force.cutoff=driving.force.cutoff,
-                                                      data_type=data_type,
-                                                      qval_cutoff=qval_cutoff_featureselection)
-    
-    
-    ## =====Refined uSort sorting==========
-    exp.refined.ordering <- fluidigmSC::updateGeneListFromList(exp.preliminary.ordering, driver.genes.refined.sorting)
+
+    ## Refined gene selection by driver genes selection
+    cds <- EXP_to_CellDataSet(EXP = exp_preliminary_ordering)
+    driver_genes_refined_order <- feature_selection(cds = cds,
+                                                    scattering.cutoff.prob = scattering_cutoff_prob,
+                                                    driving.force.cutoff = driving_force_cutoff,
+                                                    data_type = data_type,
+                                                    qval_cutoff = qval_cutoff_featureSelection)
+
+    ## Refined uSort sorting
+    exp_driver_genes_refined_ordering <- updateGeneListFromList(exp_preliminary_ordering,
+                                                                driver_genes_refined_order)
     cat('Refined sorting:\n')
-    refined.ordering <- sorting_wrapper(t(exp.refined.ordering$log2ex_data), local_sort=T, sorting_method = sorting_method,
-                                      baseNm = 'refined', sigma_width=sigma_width,
-                                      no_randomization=no_randomization, data_type=data_type,
-                                      alpha=alpha)
-    exp.refined.ordering <- updateSampleListFromList(exp.refined.ordering, refined.ordering)
-    write.table(exp.refined.ordering$sample_list, file='refined.cell.ordering.txt',row.names = F,col.names = T, quote=T, sep='\t')
+    refined_ordering <- sorting_wraper(exp_driver_genes_refined_ordering,
+                                       data_type = data_type,
+                                       method = preliminary_sort_method,
+                                       local_sort = T,
+                                       sorting_method = sorting_method,
+                                       sigma_width = sigma_width,
+                                       no_randomization = no_randomization,
+                                       data_type = data_type,
+                                       alpha = alpha)
 
-    ## ===== For STS sorting: Refining with Wanderlust==========
-    if(sorting_method=='STS' && data_type == 'linear'){
-        ## command
-        command = "python3.4"
-        path2script="../wanderlust.py"
-        ## Prepare data file
-        tdata <- t(exp.refined.ordering$log2ex_data)
-        write.csv(tdata, file = "log2ex_drivergenes_refinedOrdering_logTrans.csv")
-        
-        # Forward first cell
-        cat('Refined sorting using Wanderlust:\n')
-        startingCell <- as.character(refined.ordering$SampleID[1])
-        args = startingCell
-        allArgs = c(path2script, args)
-        output = system2(command, args=allArgs, stdout=TRUE)
-        wanderlust_trajectory <- read.csv("wanderlust_trajectory.csv",
-                                          sep = "\t", header = FALSE, row.names = 1)
-        colnames(wanderlust_trajectory) <- 'pseudotime'
-        sorted_wanderlust_trajectory <- wanderlust_trajectory[order(wanderlust_trajectory$pseudotime),,drop=F]
-        wanderlust_ordering1 <- data.frame('SampleID'= rownames(sorted_wanderlust_trajectory), 'GroupID'='untitled')
-        wanderlust.exp1 <- updateSampleListFromList(exp.refined.ordering, wanderlust_ordering1)
-        c1 <- STS_sortingcost(expr = t(wanderlust.exp1$log2ex_data))
-        #cat('Starting cell ', startingCell,', cost=', c1 ,'\n')
-        
-        # Reverse first cell
-        startingCell <- as.character(refined.ordering$SampleID[nrow(refined.ordering)])
-        args = startingCell
-        allArgs = c(path2script, args)
-        output = system2(command, args=allArgs, stdout=TRUE)
-        wanderlust_trajectory <- read.csv("wanderlust_trajectory.csv",
-                                          sep = "\t", header = FALSE, row.names = 1)
-        colnames(wanderlust_trajectory) <- 'pseudotime'
-        sorted_wanderlust_trajectory <- wanderlust_trajectory[order(wanderlust_trajectory$pseudotime),,drop=F]
-        wanderlust_ordering2 <- data.frame('SampleID'= rownames(sorted_wanderlust_trajectory), 'GroupID'='untitled')
-        wanderlust.exp2 <- updateSampleListFromList(exp.refined.ordering, wanderlust_ordering2)
-        c2 <- STS_sortingcost(expr = t(wanderlust.exp2$log2ex_data))
-        #cat('Starting cell ', startingCell,', cost=', c2 ,'\n')
-        
+    exp_refined_ordering <- updateSampleListFromList(exp_driver_genes_refined_ordering, refined_ordering)
+    write.table(exp_refined_ordering$sample_list,
+                file = 'refined.cell.ordering.txt',
+                row.names = F,
+                col.names = T,
+                quote = T,
+                sep = '\t')
 
-        # Pick an optimal ordering
-        if(c1 < c2){
-            write.table(wanderlust_ordering1, file='wanderlust_ordering.txt', row.names = F, col.names = T,
-                        quote = F, sep = '\t')      
-            exp.refined.ordering <- updateSampleListFromList(exp.refined.ordering, wanderlust_ordering1)
-            cat('Starting cell ', startingCell,', cost=', c1 ,'(driver genes)\n')
-        }else{
-            write.table(wanderlust_ordering2, file='wanderlust_ordering.txt', row.names = F, col.names = T,
-                        quote = F, sep = '\t')      
-            exp.refined.ordering <- updateSampleListFromList(exp.refined.ordering, wanderlust_ordering2)
-            cat('Starting cell ', startingCell,', cost=', c2 ,'(driver genes)\n')
-        
-        }
-        exp.cost <- fluidigmSC::updateGeneListFromFile(exp.refined.ordering, gene_list_file='pca.genes.txt')
-        STScost <- STS_sortingcost(expr = t(exp.cost$log2ex_data))
-        cat('STS sorting cost of final ordering (PCA genes) = ', STScost, '\n')
+    ## Plot driver gene profiles on final ordering
+    pdf('final.driver.genes.profiles.pdf', width = 8)
+    heatmap.2(as.matrix( exp_refined_ordering$log2ex_data),
+              dendrogram = 'row',
+              trace = 'none',
+              col = bluered,
+              Rowv = T,
+              Colv = F,
+              scale = 'row',
+              cexRow = 0.5,
+              margins = c(8, 8))
+    dev.off()
 
-    }else if(sorting_method=='neighborhood' && data_type == 'cyclical'){
-        exp.cost <- fluidigmSC::updateGeneListFromFile(exp.refined.ordering, gene_list_file='pca.genes.txt')
-        Neighborhoodcost <- neighborhood_sortingcost(expr = t(exp.cost$log2ex_data), sigma_width=1)
-        cat('Neighborhood sorting cost of final ordering (PCA genes) = ', Neighborhoodcost, '\n')
-        STScost <- STS_sortingcost(expr = t(exp.cost$log2ex_data))
-        cat('STS sorting cost of final ordering (PCA genes) = ', STScost, '\n')
+    ## Plot cell-to-cell distance heatmap
+    c2c.dist <- distance.function(t(exp_refined_ordering$log2ex_data))
+    pdf('C2C.distHeatmap.pdf')
+    col <- gplots::colorpanel(10, "red", "yellow", "blue")
+    gplots::heatmap.2(c2c.dist,
+                      dendrogram = 'none',
+                      trace = 'none',
+                      col = col,
+                      Rowv = F,
+                      Colv = F,
+                      labCol = NA ,
+                      labRow = NA ,
+                      keysize = 1.2,
+                      cexRow = 1.1,
+                      main = paste('Cell to cell distance \ncomputed on ',
+                                   nrow(driver_genes_refined_order), ' genes'))
+    dev.off()
+
+    return(exp_refined_ordering$sample_list)
+}
+
+
+#' Data loading and pre-processign for uSort
+#'
+#' @param exprsData
+#' @param preProcess
+uSort_preProcess <- function(exprsData, preProcess = TRUE){
+
+    if(file.exists(exprs_data)){
+        exp_noOutlier <- fluidigmSC::identifyOutliers(exprsData)  ## load data from file
+    }else if(is.object(exprs_data)){
+        exp_noOutlier <- exprsData                                ## data is a object
+    }else{
+        stop("Cannot loading data, please check your exprsData parameter!")
     }
 
-    ##==========================================
-    ## Plot driver gene profiles on final ordering
-    pdf('final.driver.genes.profiles.pdf',width=8)     
-    heatmap.2(as.matrix(exp.refined.ordering$log2ex_data),dendrogram='row',trace='none',col = bluered,
-              Rowv=T,Colv=F,scale = 'row',cexRow=0.5,  margins = c(8, 8))
-    dev.off()
-    
-    ## Plot cell-to-cell distance heatmap
-    c2c.dist<-distance.function(t(exp.refined.ordering$log2ex_data))
-    pdf('C2C.distHeatmap.pdf')
-    col<-gplots::colorpanel( 10, "red", "yellow", "blue" )
-    gplots::heatmap.2(c2c.dist,dendrogram='none',trace='none',col=col,
-                      Rowv=F,Colv=F,labCol=NA ,labRow=NA ,keysize=1.2,
-                      cexRow =1.1,
-                      main=paste('Cell to cell distance \ncomputed on ',nrow(driver.genes.refined.sorting), ' genes'))
-    dev.off()
-    
-    
-    return(exp.refined.ordering$sample_list)
+    cat('\nOriginal data: no. of genes = ',
+        nrow(exprsData$org_data),
+        '\t no. of samples = ',
+        ncol(exprsData$org_data),
+        '\n'
+        )
+    if(preProcess){
+        exp_trimmed <- pre_processing(exp_noOutlier)
+        cat(
+            'After SINGuLAR pre-processing: no. of genes = ',
+            nrow(exp_trimmed$gene_list),
+            '\t no. of samples = ',
+            nrow(exp_trimmed$sample_list),
+            '\n'
+        )
+        return(exp_trimmed)
+    }else{
+        exp_trimmed <- exp_noOutlier
+    }
+
+    return(exp_trimmed)
 }
+
+
+#' wrapper of all avaliable sorting methods in uSort
+#'
+#'
+#' @param data
+#' @param method
+#' @param data_type
+#' @param sorting_method
+#' @param alpha
+#' @param sigma_width
+#' @param no_randomization
+#' @param diffusionmap_components
+#' @param num_waypoints
+#' @param waypoints_seed
+sorting_wraper <- function(data,
+                           method = c("autoSPIN, sWanderlust, monocle, SPIN"),
+                           # autoSPIN parameters
+                           data_type = c("linear", "cyclical"),
+                           sorting_method = c("STS", "neighborhood"),
+                           alpha = 0.2,
+                           sigma_width = 1,
+                           no_randomization = 10,
+                           # Wanderlust parameters
+                           diffusionmap_components = 4,
+                           l=15, k=15,
+                           num_waypoints = 150,
+                           waypoints_seed = 2711){
+
+    data_type <- match.arg(data_type)
+    method <- match.arg(method)
+    data_type <- match.arg(data_type)
+    sorting_method <- match.arg(sorting_method)
+    switch(method,
+           autoSPIN = {
+               order <- autoSPIN(t(data$log2ex_data),
+                                 sorting_method = sorting_method,
+                                 baseNm = 'preliminary',
+                                 sigma_width = sigma_width,
+                                 no_randomization = no_randomization,
+                                 data_type = data_type,
+                                 alpha = alpha)
+           },
+           SPIN = {
+               order <- SPIN(t(data$log2ex_data),
+                             baseNm = 'SPIN',
+                             sorting_method = sorting_method,
+                             sigma_width = sigma_width)
+
+           },
+           monocle = {
+               g <- data$gene_list
+               cds <- EXP_to_CellDataSet(EXP = data)
+               f <- fData(cds)
+               f$gene_short_name <- rownames(f)
+               fData(cds) <- f
+               cds <- setOrderingFilter(cds, ordering_genes = g[,1])
+               cds <- reduceDimension(cds, use_irlba=FALSE)
+               cds <- orderCells(cds, num_paths=num_path, reverse=TRUE)
+               pseudotime <- pData(cds)
+               pseudotime <- pseudotime[order(pseudotime$Pseudotime), ,drop=FALSE]
+               order <- rownames(pseudotime)
+           },
+           sWanderlust = {
+               order <- sWanderlust(data,
+                                    alpha = alpha,
+                                    sorting_method = sorting_method,
+                                    baseNm = 'uSPIN',
+                                    sigma_width = sigma_width,
+                                    data_type = data_type,
+                                    diffusionmap_components = diffusionmap_components,
+                                    l=l, k=k,
+                                    num_waypoints = num_waypoints,
+                                    waypoints_seed = waypoints_seed)
+           })
+
+    return(order)
+}
+
 
 
