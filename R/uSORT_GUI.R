@@ -9,7 +9,8 @@
 #' @seealso \code{\link{uSORT-package}}, \code{\link{uSORT}}
 #' @references \url{http://JinmiaoChenLab.github.io/uSORT/}
 #' @examples
-#' #uSORT_GUI()  # remove the hash symbol to run
+#' interactive()
+#' #if(interactive()) uSORT_GUI()  # remove the hash symbol to run
 uSORT_GUI <- function(){
     paras <- uSORT_parameters_GUI()
 
@@ -68,6 +69,8 @@ uSORT_GUI <- function(){
 #'
 #' This is a function for generating the GUI for uSORT,
 #' it's called by \code{\link{uSORT_GUI}}. For internal use only.
+#'
+#' @return a list of parameters.
 #'
 #' @author Hao Chen
 uSORT_parameters_GUI <- function(){
@@ -307,6 +310,7 @@ uSORT_parameters_GUI <- function(){
 #' \code{\link{uSORT_parameters_GUI}}. For internal use only.
 #'
 #' @param method method name.
+#' @return a list of parameters.
 #'
 #' @author Hao Chen
 sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",

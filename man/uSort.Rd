@@ -98,6 +98,9 @@ uSORT(exprs_file, log_transform = TRUE, remove_outliers = TRUE,
 
 \item{ref_wanderlust_waypoints_seed}{The seed for reproducing the wanderlust results.}
 }
+\value{
+results object (a list)
+}
 \description{
 This package is designed to uncover the intrinsic cell progression path
 from single-cell RNA-seq data.

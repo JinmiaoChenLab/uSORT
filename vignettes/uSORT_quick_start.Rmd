@@ -24,9 +24,9 @@ The uSORT workflow can be applied through either the user-friendly GUI or callin
 
 After the installation of the uSORT pacakge, the GUI can be easily launched by a single command.
 
-```{r, eval=FALSE}
+```{r}
 require(uSORT)
-uSORT_GUI()
+# uSORT_GUI()  
 ```
 
 On mac, the GUI will appear as shown below:
@@ -92,26 +92,26 @@ uSORT(exprs_file,
 
 Runing the pacakge through the GUI is quite straightforward, so here we demo the usage of the main function with an example:
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 dir <- system.file('extdata', package='uSORT')
 file <- list.files(dir, pattern='.txt$', full=TRUE)
-uSORT_results <- uSORT(exprs_file = file, 
-                       log_transform = TRUE,
-                       remove_outliers = TRUE,
-                       project_name = "uSORT_example",
-                       preliminary_sorting_method = "autoSPIN", 
-                       refine_sorting_method = "sWanderlust",
-                       result_directory = getwd(),
-                       save_results = TRUE,
-                       reproduce_seed = 1234)
+# uSORT_results <- uSORT(exprs_file = file, 
+#                        log_transform = TRUE,
+#                        remove_outliers = TRUE,
+#                        project_name = "uSORT_example",
+#                        preliminary_sorting_method = "autoSPIN", 
+#                        refine_sorting_method = "sWanderlust",
+#                        result_directory = getwd(),
+#                        save_results = TRUE,
+#                        reproduce_seed = 1234)
 ```
 
 ## Result Object and files
 
 When the analysis is done, the results will be returned in a list:
 
-```{r, eval=FALSE}
-str(uSORT_results)
+```{r, eval=TRUE}
+#str(uSORT_results)
 
 # List of 7
 #  $ exp_raw                        : num [1:251, 1:43280] 1.08 0 0 0.62 0 0 0 0.27 1.16 0 ...
@@ -184,8 +184,6 @@ legend("topright",
        inset=c(0,-0.01),
        pt.cex=1.5)
 ```
-
-
 
 ![](preliminary_sorting_cell_type.png)
 

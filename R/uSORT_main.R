@@ -57,6 +57,7 @@ NULL
 #' @param ref_wanderlust_num_waypoints Number of waypoint used for wanderlust, default is 150
 #'
 #' @export
+#' @return results object (a list)
 #' @seealso \code{\link{uSORT-package}}, \code{\link{uSORT_GUI}}
 #'
 #' @examples

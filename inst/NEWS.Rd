@@ -1,12 +1,28 @@
 \name{NEWS}
-\title{News for Package \pkg{uSort}}
+\title{News for Package \pkg{uSORT}}
+
+\section{Changes in version 0.99.1(2016-09-8)}{
+  \subsection{MODIFICATION}{
+    \itemize{
+      \item updated according to first bioCheck results.
+    }
+  }
+}
+
 
 \section{Changes in version 0.99.0(2016-08-22)}{
   \subsection{MODIFICATION}{
     \itemize{
-      \item change main function name from uSort_main to uSort
-      \item remove exp.outlier.removed parameter, change preprocess_flag to if_preprocessed to indicate the file type(if preprocessed or not)
-      \item
+      \item added the main function for uSORT named uSORT in file uSORT_main.R
+      \item added function uSORT_sorting_wrapper
+      \item added GUI function uSORT_GUI
+      \item structured all codes for preprocessing to file uSORT_preProcess.R
+      \item structured all codes for postprocessing to file uSORT_postProcess.R
+      \item structured all codes for gene selection to file uSORT_GeneSelection.R
+      \item added documentations for exported functions
+      \item added one vignettes for the package
+      \item added test code for the pacakge
+      \item added namespace and dependencies declarition
     }
   }
 }

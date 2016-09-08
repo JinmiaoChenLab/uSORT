@@ -10,6 +10,9 @@ sorting_method_parameter_GUI(method = c("autoSPIN", "sWanderlust", "monocle",
 \arguments{
 \item{method}{method name.}
 }
+\value{
+a list of parameters.
+}
 \description{
 The parameters appeared on GUI are based on input method, this function is called by
 \code{\link{uSORT_parameters_GUI}}. For internal use only.

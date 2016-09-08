@@ -6,6 +6,9 @@
 \usage{
 uSORT_parameters_GUI()
 }
+\value{
+a list of parameters.
+}
 \description{
 This is a function for generating the GUI for uSORT,
 it's called by \code{\link{uSORT_GUI}}. For internal use only.

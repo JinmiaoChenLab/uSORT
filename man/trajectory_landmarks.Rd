@@ -27,6 +27,9 @@ trajectory_landmarks(knn, data, s, partial_order = NULL, waypoints = 250,
 
 \item{band_sample}{if give more chance to nearest neighbours of starting point in randomly waypoints selection.}
 }
+\value{
+a list
+}
 \description{
 determining initial trajectory and landmarks
 }

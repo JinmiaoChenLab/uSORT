@@ -53,4 +53,7 @@ pd2 <- data.frame(id = seq_along(row.names(data)), label=data_label, stringsAsFa
 #ggplot(pd1, aes(x=id, y=id, colour = label)) + geom_point() + theme_bw()
 #ggplot(pd2, aes(x=id, y=id, colour = label)) + geom_point() + theme_bw()
 }
+\author{
+Hao Chen
+}
 

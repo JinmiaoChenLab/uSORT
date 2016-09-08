@@ -13,6 +13,9 @@ uSORT_write_results(uSORT_results, project_name, result_directory)
 
 \item{result_directory}{The path where to save the results.}
 }
+\value{
+save the results.
+}
 \description{
 Save result object into a RData file. Save cell to cell distance heatmap for
 both preliminary and refined results. Creat plot of driver gene profiles on
@@ -23,12 +26,12 @@ dir <- system.file('extdata', package='uSORT')
 file <- list.files(dir, pattern='.txt$', full=TRUE)
 #remove the # symbol of the following codes to test
 #uSORT_results <- uSORT(exprs_file = file,
-# project_name = "test",
-# preliminary_sorting_method = "autoSPIN",
-# refine_sorting_method = "sWanderlust",
+# project_name = 'test',
+# preliminary_sorting_method = 'autoSPIN',
+# refine_sorting_method = 'sWanderlust',
 # save_results = FALSE)
 #uSORT_write_results(uSORT_results,
-# project_name = "test",
+# project_name = 'test',
 # result_directory = getwd())
 }
 

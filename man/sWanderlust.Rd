@@ -45,4 +45,7 @@ data <- shuffled_iris[,1:4]
 data_label <- shuffled_iris[,5]
 wishbone <- sWanderlust(data = data, num_waypoints = 100)
 }
+\author{
+Hao Chen
+}
 

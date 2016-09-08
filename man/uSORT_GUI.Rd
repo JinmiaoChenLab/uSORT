@@ -13,7 +13,8 @@ the GUI for \code{uSORT-package}
 This GUI provides an easy way for applying the uSORT package.
 }
 \examples{
-#uSORT_GUI()  # remove the hash symbol to run
+interactive()
+#if(interactive()) uSORT_GUI()  # remove the hash symbol to run
 }
 \author{
 Hao Chen

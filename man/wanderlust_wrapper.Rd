@@ -27,7 +27,13 @@ wanderlust_wrapper(data, s, diffusionmap_components = 4, l = 15, k = 15,
 
 \item{flock_waypoints}{The number of times for flocking the waypoints, default is 2.}
 }
+\value{
+sorted order.
+}
 \description{
 a wrapper of wanderlust for sWanderlust
+}
+\author{
+Hao Chen
 }
 
