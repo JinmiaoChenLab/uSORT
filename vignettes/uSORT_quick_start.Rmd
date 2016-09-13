@@ -44,47 +44,8 @@ In the main GUI window, give a project name and choose the result path, then cli
 
 User can also directly call the main function named `uSORT` of the pacakge. The documentation file can be extracted using command `?uSORT`. The usage and parameters of `uSORT` function is shown below:
 
-```{r, eval=FALSE}
-uSORT(exprs_file,
-      log_transform = TRUE,
-      remove_outliers = TRUE,
-      preliminary_sorting_method = c("autoSPIN", "sWanderlust", "monocle", "Wanderlust", "SPIN", "none"),
-      refine_sorting_method = c("autoSPIN", "sWanderlust", "monocle", "Wanderlust", "SPIN", "none"),
-      project_name = "uSORT",
-      result_directory = getwd(),
-      nCores = 1,
-      save_results = TRUE,
-      reproduce_seed = 1234,
-      # gene selection parameters
-      scattering_cutoff_prob = 0.75,
-      driving_force_cutoff = NULL,
-      qval_cutoff_featureSelection = 0.05,
-      # autoSPIN parameters for preliminary sorting
-      pre_data_type = c("linear", "cyclical"),
-      pre_SPIN_option = c("STS", "neighborhood"),
-      pre_SPIN_sigma_width = 1,
-      pre_autoSPIN_alpha = 0.2,
-      pre_autoSPIN_randomization = 20,
-      # Wanderlust parameters for preliminary sorting
-      pre_wanderlust_start_cell = NULL,
-      pre_wanderlust_dfmap_components = 4,
-      pre_wanderlust_l = 15,
-      pre_wanderlust_num_waypoints = 150,
-      pre_wanderlust_waypoints_seed = 2711,
-      pre_wanderlust_flock_waypoints = 2,
-      # autoSPIN parameters for refine sorting
-      ref_data_type = c("linear", "cyclical"),
-      ref_SPIN_option = c("STS", "neighborhood"),
-      ref_SPIN_sigma_width = 1,
-      ref_autoSPIN_alpha = 0.2,
-      ref_autoSPIN_randomization = 20,
-      # Wanderlust parameters for refine sorting
-      ref_wanderlust_start_cell = NULL,
-      ref_wanderlust_dfmap_components = 4,
-      ref_wanderlust_l = 15,
-      ref_wanderlust_num_waypoints = 150,
-      ref_wanderlust_flock_waypoints = 2,
-      ref_wanderlust_waypoints_seed = 2711)
+```{r, eval=TRUE}
+args(uSORT)
 ```
 
 
@@ -149,10 +110,10 @@ And if `save_results = TRUE`, several result files will be saved:
 
 If the cell type and signature genes are known, the reuslts can be validated with these information:
 
-```{r, eval=FALSE}
-sig_genes<-read.table(file.path(system.file('extdata', package='uSORT'),  'signature_genes.txt'))
-sig_genes <- as.character(sig_genes[,1])
-spl_annotat <- read.table(file.path(system.file('extdata', package='uSORT'), 'celltype.txt'),header=T)
+```{r, eval=TRUE}
+# sig_genes <- read.table(file.path(system.file('extdata', package='uSORT'),  'signature_genes.txt'))
+# sig_genes <- as.character(sig_genes[,1])
+# spl_annotat <- read.table(file.path(system.file('extdata', package='uSORT'), 'celltype.txt'),header=T)
 ```
 
 ## Preliminary ordering heatmap with signature gene

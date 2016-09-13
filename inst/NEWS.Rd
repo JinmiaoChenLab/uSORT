@@ -1,6 +1,15 @@
 \name{NEWS}
 \title{News for Package \pkg{uSORT}}
 
+\section{Changes in version 0.99.2(2016-09-13)}{
+  \subsection{MODIFICATION}{
+    \itemize{
+      \item updated according to bioCheck results for version 0.99.1.
+    }
+  }
+}
+
+
 \section{Changes in version 0.99.1(2016-09-8)}{
   \subsection{MODIFICATION}{
     \itemize{

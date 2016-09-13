@@ -130,7 +130,7 @@ autoSPIN <-function(data,
                 between_dist<-sum(temp_combined_dist[(endID-one_sided_length):endID,(endID+1):(endID+one_sided_length)])
 
                 if(between_dist>between_dist_rev) {
-                    temp_combined_ordering<-temp_combined_ordering[idx,,drop=F]
+                    temp_combined_ordering<-temp_combined_ordering[idx,,drop=FALSE]
                     temp_combined_dist[idx,idx]
                 }
             }
