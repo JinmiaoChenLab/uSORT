@@ -29,12 +29,14 @@ SPIN <- function(data, sorting_method = c("STS", "neighborhood"),
     switch(sorting_method, STS = {
         global_res <- STS_sorting_wrapper(data, no_randomization = 1)
     }, neighborhood = {
-        global_res <- neighborhood_sorting_wrapper(data, no_randomization = 1,
-            sigma_width = sigma_width)
+        global_res <- neighborhood_sorting_wrapper(data,
+                                                   no_randomization = 1,
+                                                   sigma_width = sigma_width)
     })
 
     ordering <- global_res$permutated.expr
-    return(data.frame(SampleID = rownames(ordering), GroupID = rep("untitled",
+    return(data.frame(SampleID = rownames(ordering),
+                      GroupID = rep("untitled",
         n)))
 }
 
@@ -60,14 +62,14 @@ STS_sorting_wrapper <- function(expr, no_randomization = 10) {
         if (i == 1)
             temp.expr <- expr else {
             rand_id <- sample.int(n)
-            temp.expr <- expr[rand_id, , drop = F]
+            temp.expr <- expr[rand_id, , drop = FALSE]
         }
         temp.dist <- distance.function(temp.expr)
         temp.SPIN.res <- STS_sorting(temp.dist)
 
         if (temp.SPIN.res$cost < best.cost) {
             temp.best.ordering <- temp.expr[temp.SPIN.res$ordering,
-                , drop = F]
+                , drop = FALSE]
             best.ordering <- temp.best.ordering
             best.cost <- temp.SPIN.res$cost
         }
@@ -112,12 +114,13 @@ STS_sorting <- function(d, max_iter = 10) {
         St <- Dt %*% X
 
         # Step 3
-        descending.order <- order(St, decreasing = T)
+        descending.order <- order(St, decreasing = TRUE)
         Pt <- I[descending.order, ]
         global_permutation <- global_permutation[descending.order,
             ]
-        cost <- sum(diag(global_permutation %*% d %*% t(global_permutation) %*%
-            X %*% t(X)))
+        cost <- sum(diag(global_permutation %*% d %*%
+                             t(global_permutation) %*%
+                             X %*% t(X)))
 
         ## Step 4
         if (isTRUE(all.equal((Pt %*% St), (prev_permutation %*%
@@ -274,8 +277,9 @@ neighborhood_sorting <- function(d, weights_mat = NULL, max_iter = 100) {
         # update of ordering
         Pt <- I[sorted_ind, ]
         global_permutation <- global_permutation[sorted_ind, ]
-        cost <- sum(diag(global_permutation %*% d %*% t(global_permutation) %*%
-            weights_mat))
+        cost <- sum(diag(global_permutation %*% d %*%
+                             t(global_permutation) %*%
+                             weights_mat))
         # cat('@t:', t, ' cost=', cost, '\n') ============
 
         ##

@@ -70,7 +70,8 @@ elbow_detection <- function(scores, if_plot = FALSE) {
     select_ID <- scores$id[which(scores$value >= score_cutoff)]
 
     if (if_plot) {
-        plot(seq(nrow(scores)), sorted_scores$value, col = ifelse(sorted_scores$value >=
+        plot(seq(nrow(scores)), sorted_scores$value,
+             col = ifelse(sorted_scores$value >=
             score_cutoff, "red", "black"), xlab = "ID", ylab = "Score",
             main = paste0("Optimal number = ", length(select_ID),
                 " with cutoff value = ", round(score_cutoff, digits = 4)))
@@ -163,7 +164,8 @@ driving_force_gene_selection <- function(cds, scattering.cutoff.prob = 0.75,
     driving_force <- data.frame(GeneID = rownames(trimmed_diff_test_res),
         Score = trimmed_diff_test_res[, change])
     driving_force$Score[is.infinite(driving_force$Score)] <- 0
-    driving_force <- driving_force[order(driving_force$Score, decreasing = TRUE),
+    driving_force <- driving_force[order(driving_force$Score,
+                                         decreasing = TRUE),
         , drop = FALSE]
 
     if (nrow(driving_force) <= 1)
@@ -183,7 +185,8 @@ driving_force_gene_selection <- function(cds, scattering.cutoff.prob = 0.75,
             stop("Unable to get turning point while identifying driver genes!\n")
     }
 
-    cat("  No. of genes selected for final sorting = ", length(selected_driver_genes),
+    cat("  No. of genes selected for final sorting = ",
+        length(selected_driver_genes),
         "\n")
     return(as.character(selected_driver_genes))
 }
@@ -200,17 +203,21 @@ driving_force_gene_selection <- function(cds, scattering.cutoff.prob = 0.75,
 #'
 #' @importFrom Biobase esApply
 #' @return test results
-differentialGeneTest1 <- function(cds, fullModelFormulaStr = "expression~sm.ns(Pseudotime, df=3)",
+differentialGeneTest1 <- function(cds,
+                                  fullModelFormulaStr = "expression~sm.ns(Pseudotime, df=3)",
     reducedModelFormulaStr = "expression~1", cores = 1) {
     if (cores > 1) {
         diff_test_res <- mcesApply1(cds, 1, diff_test_helper1,
             cores = cores, fullModelFormulaStr = fullModelFormulaStr,
-            reducedModelFormulaStr = reducedModelFormulaStr, expressionFamily = cds@expressionFamily,
+            reducedModelFormulaStr = reducedModelFormulaStr,
+            expressionFamily = cds@expressionFamily,
             lowerDetectionLimit = cds@lowerDetectionLimit)
         diff_test_res
     } else {
-        diff_test_res <- esApply(cds, 1, diff_test_helper1, fullModelFormulaStr = fullModelFormulaStr,
-            reducedModelFormulaStr = reducedModelFormulaStr, expressionFamily = cds@expressionFamily,
+        diff_test_res <- esApply(cds, 1, diff_test_helper1,
+                                 fullModelFormulaStr = fullModelFormulaStr,
+            reducedModelFormulaStr = reducedModelFormulaStr,
+            expressionFamily = cds@expressionFamily,
             lowerDetectionLimit = cds@lowerDetectionLimit)
         diff_test_res
     }
@@ -353,9 +360,11 @@ diff_test_helper1 <- function(x, fullModelFormulaStr, reducedModelFormulaStr,
     for (i in 1:20) {
         test_res <- tryCatch({
 
-            full_model_fit <- suppressWarnings(vgam(as.formula(fullModelFormulaStr),
+            full_model_fit <- suppressWarnings(
+                vgam(as.formula(fullModelFormulaStr),
                 family = expressionFamily))
-            reduced_model_fit <- suppressWarnings(vgam(as.formula(reducedModelFormulaStr),
+            reduced_model_fit <- suppressWarnings(
+                vgam(as.formula(reducedModelFormulaStr),
                 family = expressionFamily))
 
 
@@ -367,11 +376,14 @@ diff_test_helper1 <- function(x, fullModelFormulaStr, reducedModelFormulaStr,
                 pred_res[pred_res < log10(lowerDetectionLimit)] <- log10(lowerDetectionLimit)
             }
 
-            pred <- data.frame(Pseudotime = p$Pseudotime, expectation = log10(pred_res))
+            pred <- data.frame(Pseudotime = p$Pseudotime,
+                               expectation = log10(pred_res))
             pred <- pred[order(pred$Pseudotime), ]
             cyclic.driving.force <- diff(range(pred$expectation))
-            linear.driving.force <- abs(pred$expectation[1] - pred$expectation[nrow(pred)])
-            res <- compareModels1(list(full_model_fit), list(reduced_model_fit))
+            linear.driving.force <- abs(pred$expectation[1] -
+                                            pred$expectation[nrow(pred)])
+            res <- compareModels1(list(full_model_fit),
+                                  list(reduced_model_fit))
             res$cyclic.driving.force <- cyclic.driving.force
             res$linear.driving.force <- linear.driving.force
             if (is.na(cyclic.driving.force) | is.na(linear.driving.force)) {
@@ -383,7 +395,8 @@ diff_test_helper1 <- function(x, fullModelFormulaStr, reducedModelFormulaStr,
 
         }, error = function(e) {
             print(e)
-            data.frame(status = "FAIL", pval = 1, qval = 1, cyclic.driving.force = 0,
+            data.frame(status = "FAIL", pval = 1, qval = 1,
+                       cyclic.driving.force = 0,
                 linear.driving.force = 0)
         })
         if (test_res$status != "FAIL")

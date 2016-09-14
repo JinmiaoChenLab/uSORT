@@ -29,46 +29,61 @@
 #' PCA_selected_genes <- pca_gene_selection(exp_trimmed)
 #' exp_PCA_genes <- exp_trimmed[, PCA_selected_genes]
 #' #order <- uSORT_sorting_wrapper(data = exp_PCA_genes, method = 'autoSPIN')
-uSORT_sorting_wrapper <- function(data, data_raw, method = c("autoSPIN", 
-    "sWanderlust", "monocle", "Wanderlust", "SPIN", "none"), data_type = c("linear", 
-    "cyclical"), SPIN_option = c("STS", "neighborhood"), SPIN_sigma_width = 1, 
-    autoSPIN_alpha = 0.2, autoSPIN_randomization = 20, wanderlust_start_cell = NULL, 
-    wanderlust_dfmap_components = 4, wanderlust_l = 15, wanderlust_num_waypoints = 150, 
-    wanderlust_waypoints_seed = 2711, wanderlust_flock_waypoints = 2) {
-    
+uSORT_sorting_wrapper <- function(data, data_raw,
+    method = c("autoSPIN", "sWanderlust", "monocle", "Wanderlust",
+               "SPIN", "none"),
+    data_type = c("linear", "cyclical"),
+    SPIN_option = c("STS", "neighborhood"),
+    SPIN_sigma_width = 1,
+    autoSPIN_alpha = 0.2,
+    autoSPIN_randomization = 20,
+    wanderlust_start_cell = NULL,
+    wanderlust_dfmap_components = 4,
+    wanderlust_l = 15,
+    wanderlust_num_waypoints = 150,
+    wanderlust_waypoints_seed = 2711,
+    wanderlust_flock_waypoints = 2) {
+
     data_type <- match.arg(data_type)
     method <- match.arg(method)
     data_type <- match.arg(data_type)
     SPIN_option <- match.arg(SPIN_option)
     switch(method, autoSPIN = {
-        res <- autoSPIN(data, data_type = data_type, sorting_method = SPIN_option, 
-            sigma_width = SPIN_sigma_width, alpha = autoSPIN_alpha, 
+        res <- autoSPIN(data, data_type = data_type,
+                        sorting_method = SPIN_option,
+            sigma_width = SPIN_sigma_width, alpha = autoSPIN_alpha,
             no_randomization = autoSPIN_randomization)
         order <- res$SampleID
     }, SPIN = {
-        res <- SPIN(data = data, sorting_method = SPIN_option, 
+        res <- SPIN(data = data, sorting_method = SPIN_option,
             sigma_width = SPIN_sigma_width)
         order <- res$SampleID
-        
+
     }, monocle = {
-        order <- monocle_wrapper(log2_exp = data, expression_data_raw = data_raw)
+        order <- monocle_wrapper(log2_exp = data,
+                                 expression_data_raw = data_raw)
     }, Wanderlust = {
-        res <- wanderlust_wrapper(data, s = wanderlust_start_cell, 
-            diffusionmap_components = wanderlust_dfmap_components, 
-            l = wanderlust_l, k = wanderlust_l, num_waypoints = wanderlust_num_waypoints, 
-            waypoints_seed = wanderlust_waypoints_seed, flock_waypoints = wanderlust_flock_waypoints)
+        res <- wanderlust_wrapper(data, s = wanderlust_start_cell,
+            diffusionmap_components = wanderlust_dfmap_components,
+            l = wanderlust_l, k = wanderlust_l,
+            num_waypoints = wanderlust_num_waypoints,
+            waypoints_seed = wanderlust_waypoints_seed,
+            flock_waypoints = wanderlust_flock_waypoints)
         order <- res$Order
     }, sWanderlust = {
-        res <- sWanderlust(data, data_type = data_type, alpha = autoSPIN_alpha, 
-            SPIN_option = SPIN_option, sigma_width = SPIN_sigma_width, 
-            diffusionmap_components = wanderlust_dfmap_components, 
-            l = wanderlust_l, k = wanderlust_l, num_waypoints = wanderlust_num_waypoints, 
-            waypoints_seed = wanderlust_waypoints_seed, flock_waypoints = wanderlust_flock_waypoints)
+        res <- sWanderlust(data, data_type = data_type,
+                           alpha = autoSPIN_alpha,
+            SPIN_option = SPIN_option, sigma_width = SPIN_sigma_width,
+            diffusionmap_components = wanderlust_dfmap_components,
+            l = wanderlust_l, k = wanderlust_l,
+            num_waypoints = wanderlust_num_waypoints,
+            waypoints_seed = wanderlust_waypoints_seed,
+            flock_waypoints = wanderlust_flock_waypoints)
         order <- res
     }, none = {
         order <- NULL
     })
-    
+
     return(as.character(order))
 }
 

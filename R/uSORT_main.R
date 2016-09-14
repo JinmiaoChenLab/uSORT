@@ -133,56 +133,60 @@ uSORT <- function(exprs_file,
 
     ## preliminary uSORT sorting
     cat(paste0("-Preliminary sorting using ", preliminary_sorting_method, "\n"))
-    preliminary_sorting_order <- uSORT_sorting_wrapper(data = exp_PCA_genes,
-                                                       data_raw = exp_raw,
-                                                       method = preliminary_sorting_method,
-                                                       data_type = pre_data_type,
-                                                       SPIN_option = pre_SPIN_option,
-                                                       SPIN_sigma_width = pre_SPIN_sigma_width,
-                                                       autoSPIN_alpha = pre_autoSPIN_alpha,
-                                                       autoSPIN_randomization = pre_autoSPIN_randomization,
-                                                       wanderlust_start_cell = pre_wanderlust_start_cell,
-                                                       wanderlust_dfmap_components = pre_wanderlust_dfmap_components,
-                                                       wanderlust_l = pre_wanderlust_l,
-                                                       wanderlust_num_waypoints = pre_wanderlust_num_waypoints,
-                                                       wanderlust_waypoints_seed = pre_wanderlust_waypoints_seed,
-                                                       wanderlust_flock_waypoints = pre_wanderlust_flock_waypoints)
+    preliminary_sorting_order <-
+        uSORT_sorting_wrapper(data = exp_PCA_genes,
+                              data_raw = exp_raw,
+                              method = preliminary_sorting_method,
+                              data_type = pre_data_type,
+                              SPIN_option = pre_SPIN_option,
+                              SPIN_sigma_width = pre_SPIN_sigma_width,
+                              autoSPIN_alpha = pre_autoSPIN_alpha,
+                              autoSPIN_randomization = pre_autoSPIN_randomization,
+                              wanderlust_start_cell = pre_wanderlust_start_cell,
+                              wanderlust_dfmap_components = pre_wanderlust_dfmap_components,
+                              wanderlust_l = pre_wanderlust_l,
+                              wanderlust_num_waypoints = pre_wanderlust_num_waypoints,
+                              wanderlust_waypoints_seed = pre_wanderlust_waypoints_seed,
+                              wanderlust_flock_waypoints = pre_wanderlust_flock_waypoints)
 
     if(is.null(preliminary_sorting_order)){
         exp_preliminary_order <- exp_PCA_genes
         cds <- EXP_to_CellDataSet(exp_trimmed, exp_raw)
     }else{
         exp_preliminary_order <- exp_PCA_genes[preliminary_sorting_order, ]
-        cds <- EXP_to_CellDataSet(exp_trimmed[preliminary_sorting_order, ], exp_raw)
+        cds <- EXP_to_CellDataSet(exp_trimmed[preliminary_sorting_order, ],
+                                  exp_raw)
     }
 
     ## refined gene selection by driver genes selection
     cat("-Refined gene selection by driver genes detection...\n")
-    driver_genes <- driving_force_gene_selection(cds = cds,
-                                                 scattering.cutoff.prob = scattering_cutoff_prob,
-                                                 driving.force.cutoff = driving_force_cutoff,
-                                                 data_type = ref_data_type,
-                                                 qval_cutoff = qval_cutoff_featureSelection,
-                                                 nCores = nCores)
+    driver_genes <-
+        driving_force_gene_selection(cds = cds,
+                                     scattering.cutoff.prob = scattering_cutoff_prob,
+                                     driving.force.cutoff = driving_force_cutoff,
+                                     data_type = ref_data_type,
+                                     qval_cutoff = qval_cutoff_featureSelection,
+                                     nCores = nCores)
 
 
     ## refined uSORT sorting
     exp_driver_genes <- exp_trimmed[preliminary_sorting_order, driver_genes]
     cat(paste0("-Refined sorting using ", refine_sorting_method, "\n"))
-    refined_sorting_order <- uSORT_sorting_wrapper(data = exp_driver_genes,
-                                                   data_raw = exp_trimmed,
-                                                   method = refine_sorting_method,
-                                                   data_type = ref_data_type,
-                                                   SPIN_option = ref_SPIN_option,
-                                                   SPIN_sigma_width = ref_SPIN_sigma_width,
-                                                   autoSPIN_alpha = ref_autoSPIN_alpha,
-                                                   autoSPIN_randomization = ref_autoSPIN_randomization,
-                                                   wanderlust_start_cell = ref_wanderlust_start_cell,
-                                                   wanderlust_dfmap_components = ref_wanderlust_dfmap_components,
-                                                   wanderlust_l = ref_wanderlust_l,
-                                                   wanderlust_num_waypoints = ref_wanderlust_num_waypoints,
-                                                   wanderlust_waypoints_seed = ref_wanderlust_waypoints_seed,
-                                                   wanderlust_flock_waypoints = ref_wanderlust_flock_waypoints)
+    refined_sorting_order <-
+        uSORT_sorting_wrapper(data = exp_driver_genes,
+                              data_raw = exp_trimmed,
+                              method = refine_sorting_method,
+                              data_type = ref_data_type,
+                              SPIN_option = ref_SPIN_option,
+                              SPIN_sigma_width = ref_SPIN_sigma_width,
+                              autoSPIN_alpha = ref_autoSPIN_alpha,
+                              autoSPIN_randomization = ref_autoSPIN_randomization,
+                              wanderlust_start_cell = ref_wanderlust_start_cell,
+                              wanderlust_dfmap_components = ref_wanderlust_dfmap_components,
+                              wanderlust_l = ref_wanderlust_l,
+                              wanderlust_num_waypoints = ref_wanderlust_num_waypoints,
+                              wanderlust_waypoints_seed = ref_wanderlust_waypoints_seed,
+                              wanderlust_flock_waypoints = ref_wanderlust_flock_waypoints)
 
     if(is.null(refined_sorting_order)){
         exp_refined_order <- exp_driver_genes
@@ -191,13 +195,14 @@ uSORT <- function(exprs_file,
     }
 
     ## organize result object and write results
-    uSORT_results <- list(exp_raw = exp_raw,
-                          trimmed_log2exp = exp_trimmed,
-                          preliminary_sorting_genes = PCA_selected_genes,
-                          preliminary_sorting_order = preliminary_sorting_order,
-                          refined_sorting_genes = driver_genes,
-                          refined_sorting_order = refined_sorting_order,
-                          driverGene_refinedOrder_log2exp = exp_refined_order)
+    uSORT_results <-
+        list(exp_raw = exp_raw,
+             trimmed_log2exp = exp_trimmed,
+             preliminary_sorting_genes = PCA_selected_genes,
+             preliminary_sorting_order = preliminary_sorting_order,
+             refined_sorting_genes = driver_genes,
+             refined_sorting_order = refined_sorting_order,
+             driverGene_refinedOrder_log2exp = exp_refined_order)
 
     cat("-Sorting was done...\n")
     if(save_results){

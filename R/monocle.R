@@ -23,8 +23,9 @@
 #' #ggplot(annot, aes(x=id, y=id, colour = label)) + geom_point() + theme_bw()
 monocle_wrapper <- function(log2_exp, expression_data_raw, lod = 1) {
     g <- as.character(colnames(log2_exp))
-    cds <- EXP_to_CellDataSet(log2_exp = log2_exp, expression_data_raw = expression_data_raw, 
-        lod = lod)
+    cds <- EXP_to_CellDataSet(log2_exp = log2_exp,
+                              expression_data_raw = expression_data_raw,
+                              lod = lod)
     f <- fData(cds)
     f$gene_short_name <- rownames(f)
     fData(cds) <- f
@@ -46,31 +47,33 @@ monocle_wrapper <- function(log2_exp, expression_data_raw, lod = 1) {
 #'
 #' @importFrom monocle newCellDataSet
 #' @return A CellDataSet object.
-EXP_to_CellDataSet <- function(log2_exp = NULL, expression_data_raw = NULL, 
+EXP_to_CellDataSet <- function(log2_exp = NULL, expression_data_raw = NULL,
     lod = 1) {
     log2_exp <- t(log2_exp)
     expression_data_raw <- t(expression_data_raw)
     samples <- data.frame(SampleID = as.character(colnames(log2_exp)))
     genes <- data.frame(GeneID = as.character(rownames(log2_exp)))
-    
+
     exprs <- expression_data_raw
     exprs[exprs < lod] <- lod
     exprs <- exprs[, as.character(samples$SampleID)]
     exprs <- exprs[as.character(genes$GeneID), ]
-    
+
     Sample_sheet <- data.frame(samples, Pseudotime = seq(1, ncol(exprs)))
     rownames(Sample_sheet) <- Sample_sheet$SampleID
     # Sample_sheet$SampleID <- NULL
     pd <- new("AnnotatedDataFrame", data = Sample_sheet)
-    
+
     Feature_sheet <- genes
     rownames(Feature_sheet) <- Feature_sheet$GeneID
     # Feature_sheet$GeneID <- NULL
     fd <- new("AnnotatedDataFrame", data = Feature_sheet)
-    
-    res <- newCellDataSet(as.matrix(exprs), phenoData = pd, featureData = fd, 
-        lowerDetectionLimit = 0.1)
+
+    res <- newCellDataSet(as.matrix(exprs),
+                          phenoData = pd,
+                          featureData = fd,
+                          lowerDetectionLimit = 0.1)
     return(res)
-    
-    
+
+
 }

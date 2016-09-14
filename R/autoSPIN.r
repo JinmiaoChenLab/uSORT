@@ -44,9 +44,12 @@ autoSPIN <-function(data,
 
     ## =====Global sorting=========================
     if(sorting_method == 'STS') {
-        global_res <- STS_sorting_wrapper(data, no_randomization= no_randomization)
+        global_res <- STS_sorting_wrapper(data,
+                                          no_randomization= no_randomization)
     }else if(sorting_method == 'neighborhood') {
-        global_res <- neighborhood_sorting_wrapper(data, no_randomization= no_randomization, sigma_width = sigma_width)
+        global_res <- neighborhood_sorting_wrapper(data,
+                                                   no_randomization = no_randomization,
+                                                   sigma_width = sigma_width)
     }
     else{stop('Sorting type can onlyl be STS or neighborhood')}
     global_ordering <- global_res$permutated.expr
@@ -72,7 +75,8 @@ autoSPIN <-function(data,
     while(incremental_window_size < ceiling(n*window_perc_range[2])){
 
         if(length(list_windowSize)==0){
-            cat(paste0('  Testing for window size = ', incremental_window_size, ","))
+            cat(paste0('  Testing for window size = ',
+                       incremental_window_size, ","))
         }else{
             cat(paste0(incremental_window_size, ","))
         }
@@ -90,14 +94,21 @@ autoSPIN <-function(data,
             {endID<-n; stop_flag=TRUE}
 
             # Get local data window for sorting
-            data_window<-global_ordering[startID:endID,,drop=F]
+            data_window<-global_ordering[startID:endID,,drop=FALSE]
 
-            if(sorting_method == 'STS') local_res<-STS_sorting_wrapper(data_window, no_randomization=no_randomization)
-            else if(sorting_method == 'neighborhood') local_res<-neighborhood_sorting_wrapper(data_window, no_randomization= no_randomization, sigma_width = sigma_width)
+            if(sorting_method == 'STS'){
+                local_res <- STS_sorting_wrapper(data_window,
+                                                 no_randomization=no_randomization)
+            }else if(sorting_method == 'neighborhood') {
+                local_res<-neighborhood_sorting_wrapper(data_window,
+                                                        no_randomization= no_randomization,
+                                                        sigma_width = sigma_width)
+                }
             local_ordering<-local_res$permutated.expr
 
             if(i==1) temp_combined_ordering<-local_ordering
-            else temp_combined_ordering<-rbind(temp_combined_ordering,local_ordering)
+            else temp_combined_ordering<-rbind(temp_combined_ordering,
+                                               local_ordering)
 
             if(stop_flag==TRUE) break
         }
@@ -124,23 +135,24 @@ autoSPIN <-function(data,
             # 1st window is compared to the following RHS window
             if (i==1){
                 # Reversed local window reversed: sum of distance across neighboring windows
-                between_dist_rev<-sum(partially_rev_dist[(endID-one_sided_length):endID,(endID+1):(endID+one_sided_length)])
+                between_dist_rev<-sum(partially_rev_dist[(endID-one_sided_length):endID,
+                                                         (endID+1):(endID+one_sided_length)])
 
                 # Original local window: sum of distance across neighboring windows
-                between_dist<-sum(temp_combined_dist[(endID-one_sided_length):endID,(endID+1):(endID+one_sided_length)])
+                between_dist<-sum(temp_combined_dist[(endID-one_sided_length):endID,
+                                                     (endID+1):(endID+one_sided_length)])
 
                 if(between_dist>between_dist_rev) {
                     temp_combined_ordering<-temp_combined_ordering[idx,,drop=FALSE]
                     temp_combined_dist[idx,idx]
                 }
-            }
-
-            # All other windows are compared to the preceeding LHS window
-            else{
+            }else{
                 # Reversed local window reversed: sum of distance across neighboring windows
-                between_dist_rev<-sum(partially_rev_dist[(startID-one_sided_length):startID,startID:(startID+one_sided_length)])
+                between_dist_rev<-sum(partially_rev_dist[(startID-one_sided_length):startID,
+                                                         startID:(startID+one_sided_length)])
                 # Original local window: sum of distance across neighboring windows
-                between_dist<-sum(temp_combined_dist[(startID-one_sided_length):startID,startID:(startID+one_sided_length)])
+                between_dist<-sum(temp_combined_dist[(startID-one_sided_length):startID,
+                                                     startID:(startID+one_sided_length)])
 
                 if(between_dist>between_dist_rev) {
                     temp_combined_ordering<-temp_combined_ordering[idx,,drop=FALSE]
@@ -151,8 +163,9 @@ autoSPIN <-function(data,
         }
 
 
-        temp_combined_distVar<-summed_local_variance(temp_combined_ordering, alpha=alpha,
-                                                          data_type=data_type)
+        temp_combined_distVar<-summed_local_variance(temp_combined_ordering,
+                                                     alpha=alpha,
+                                                     data_type=data_type)
 
 
         list_distVar<-c(list_distVar,temp_combined_distVar)
@@ -163,11 +176,14 @@ autoSPIN <-function(data,
             lowest_distVar<-temp_combined_distVar
         }
 
-        incremental_window_size<-incremental_window_size + ceiling(n*window_size_incre_perct)
+        incremental_window_size<-incremental_window_size +
+            ceiling(n*window_size_incre_perct)
     }
     cat('\n')
 
-    if(exists("best_local_ordering")){global_ordering<-best_local_ordering}
+    if(exists("best_local_ordering")){
+        global_ordering<-best_local_ordering
+        }
     ordering <- data.frame('SampleID'=rownames(global_ordering))
 
     return(ordering)
@@ -185,7 +201,8 @@ autoSPIN <-function(data,
 #' @param method A character string indicating the distance function.
 #'
 #' @return A matrix containing n-by-n cell distance.
-distance.function<-function(expr, method= c('Euclidean','Correlation','eJaccard','none')){
+distance.function<-function(expr,
+                            method= c('Euclidean','Correlation','eJaccard','none')){
     ## Define parameters
     n<-nrow(expr)
     method_name <- match.arg(method)
@@ -194,9 +211,11 @@ distance.function<-function(expr, method= c('Euclidean','Correlation','eJaccard'
            Euclidean = {
                vecs<-as.matrix(expr)
                g2=rowSums(vecs*vecs)
-               colRepeat<-do.call("cbind", replicate(n, g2, simplify = FALSE))
+               colRepeat<-do.call("cbind", replicate(n, g2,
+                                                     simplify = FALSE))
                vv<-2*as.matrix(vecs)%*%(t(as.matrix(vecs)))
-               rowRepeat<-do.call("rbind", replicate(n, g2, simplify = FALSE))
+               rowRepeat<-do.call("rbind", replicate(n, g2,
+                                                     simplify = FALSE))
                D<-sqrt(abs(colRepeat-vv+rowRepeat))
                colnames(D)<-row.names(D)
            },
@@ -284,7 +303,9 @@ summed_local_variance_cyclical<-function(d, alpha=0.3){
 
     for(i in 1:num_cell){
         window_around_cell<-d[i,]
-        window_around_cell_extended <- c(window_around_cell,window_around_cell,window_around_cell)
+        window_around_cell_extended <- c(window_around_cell,
+                                         window_around_cell,
+                                         window_around_cell)
 
         startID <- i - (as.integer(window_size/2))
         endID <- i + (as.integer(window_size/2))

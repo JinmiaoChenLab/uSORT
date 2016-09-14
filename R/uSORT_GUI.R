@@ -35,29 +35,46 @@ uSORT_GUI <- function(){
               # autoSPIN parameters for preliminary sorting
               pre_data_type = paras$pre_data_type,
               pre_SPIN_option = paras$pre_SPIN_option,
-              pre_SPIN_sigma_width = as.numeric(paras$pre_SPIN_sigma_width),
-              pre_autoSPIN_alpha = as.numeric(paras$pre_autoSPIN_alpha),
-              pre_autoSPIN_randomization = as.numeric(paras$pre_autoSPIN_randomization),
+              pre_SPIN_sigma_width = as.numeric(
+                  paras$pre_SPIN_sigma_width),
+              pre_autoSPIN_alpha = as.numeric(
+                  paras$pre_autoSPIN_alpha),
+              pre_autoSPIN_randomization = as.numeric(
+                  paras$pre_autoSPIN_randomization),
               # autoSPIN parameters for refine sorting
               ref_data_type = paras$ref_data_type,
               ref_SPIN_option = paras$ref_SPIN_option,
-              ref_SPIN_sigma_width = as.numeric(paras$ref_SPIN_sigma_width),
-              ref_autoSPIN_alpha = as.numeric(paras$ref_autoSPIN_alpha),
-              ref_autoSPIN_randomization = as.numeric(paras$ref_autoSPIN_randomization),
+              ref_SPIN_sigma_width = as.numeric(
+                  paras$ref_SPIN_sigma_width),
+              ref_autoSPIN_alpha = as.numeric(
+                  paras$ref_autoSPIN_alpha),
+              ref_autoSPIN_randomization = as.numeric(
+                  paras$ref_autoSPIN_randomization),
               # Wanderlust parameters for preliminary sorting
-              pre_wanderlust_start_cell = as.numeric(paras$pre_wanderlust_start_cell),
-              pre_wanderlust_dfmap_components = as.numeric(paras$pre_wanderlust_dfmap_components),
-              pre_wanderlust_l = as.numeric(paras$pre_wanderlust_l),
-              pre_wanderlust_num_waypoints = as.numeric(paras$pre_wanderlust_num_waypoints),
-              pre_wanderlust_waypoints_seed = as.numeric(paras$pre_wanderlust_waypoints_seed),
-              pre_wanderlust_flock_waypoints = as.numeric(paras$pre_wanderlust_flock_waypoints),
+              pre_wanderlust_start_cell = as.numeric(
+                  paras$pre_wanderlust_start_cell),
+              pre_wanderlust_dfmap_components = as.numeric(
+                  paras$pre_wanderlust_dfmap_components),
+              pre_wanderlust_l = as.numeric(
+                  paras$pre_wanderlust_l),
+              pre_wanderlust_num_waypoints = as.numeric(
+                  paras$pre_wanderlust_num_waypoints),
+              pre_wanderlust_waypoints_seed = as.numeric(
+                  paras$pre_wanderlust_waypoints_seed),
+              pre_wanderlust_flock_waypoints = as.numeric(
+                  paras$pre_wanderlust_flock_waypoints),
               # Wanderlust parameters for refine sorting
-              ref_wanderlust_start_cell = as.numeric(paras$ref_wanderlust_start_cell),
-              ref_wanderlust_dfmap_components = as.numeric(paras$ref_wanderlust_dfmap_components),
+              ref_wanderlust_start_cell = as.numeric(
+                  paras$ref_wanderlust_start_cell),
+              ref_wanderlust_dfmap_components = as.numeric(
+                  paras$ref_wanderlust_dfmap_components),
               ref_wanderlust_l = as.numeric(paras$ref_wanderlust_l),
-              ref_wanderlust_num_waypoints = as.numeric(paras$ref_wanderlust_num_waypoints),
-              ref_wanderlust_waypoints_seed = as.numeric(paras$ref_wanderlust_waypoints_seed),
-              ref_wanderlust_flock_waypoints = as.numeric(paras$ref_wanderlust_flock_waypoints)
+              ref_wanderlust_num_waypoints = as.numeric(
+                  paras$ref_wanderlust_num_waypoints),
+              ref_wanderlust_waypoints_seed = as.numeric(
+                  paras$ref_wanderlust_waypoints_seed),
+              ref_wanderlust_flock_waypoints = as.numeric(
+                  paras$ref_wanderlust_flock_waypoints)
         )
     }else{
         message("uSORT analysis cancelled!")
@@ -75,7 +92,8 @@ uSORT_GUI <- function(){
 #' @author Hao Chen
 uSORT_parameters_GUI <- function(){
     ## global options
-    sort_options <- c("autoSPIN", "sWanderlust", "monocle", "Wanderlust", "SPIN", "none")
+    sort_options <- c("autoSPIN", "sWanderlust", "monocle",
+                      "Wanderlust", "SPIN", "none")
     data_type_options <- c("linear", "cyclical")
     SPIN_option <- c("STS", "neighborhood")
 
@@ -117,10 +135,11 @@ uSORT_parameters_GUI <- function(){
     ## widget control functions (commonds)
     reset_input_data_file <- function(){
         InputFile <- NULL
-        InputFile <- tk_choose.files(default = paste(tclvalue(result_directory), "fso",
-                                                     sep = .Platform$file.sep),
-                                     caption = "Select your data file", multi = FALSE,
-                                     filters = matrix(c("{txt files}", "{.txt}"),1, 2), index = 1)
+        InputFile <- tk_choose.files(
+            default = paste(tclvalue(result_directory), "fso",
+                            sep = .Platform$file.sep),
+            caption = "Select your data file", multi = FALSE,
+            filters = matrix(c("{txt files}", "{.txt}"),1, 2), index = 1)
         if (!is.null(InputFile)){
             tclvalue(input_data_file) <- InputFile
             tclvalue(result_directory) <- dirname(InputFile)
@@ -166,7 +185,8 @@ uSORT_parameters_GUI <- function(){
 
     reset_result_directory <- function(){
         ResultDir <- NULL
-        ResultDir <- tclvalue(tkchooseDirectory(title = "Choose your data dircetory ..."))
+        ResultDir <- tclvalue(tkchooseDirectory(
+            title = "Choose your data dircetory ..."))
         if (!is.null(ResultDir))
             tclvalue(result_directory) <- ResultDir
     }
@@ -188,7 +208,8 @@ uSORT_parameters_GUI <- function(){
         if (!file.exists(tclvalue(input_data_file))) {
             ErrorFlag <- TRUE
             tkmessageBox(title = "uSORT Package",
-                         message = "Data file doesn't exit, please provide correct data file.",
+                         message = "Data file doesn't exit,
+                         please provide correct data file.",
                          icon = "info", type = "ok")
         }
 
@@ -204,17 +225,22 @@ uSORT_parameters_GUI <- function(){
     tkwm.title(tt, "uSORT Analysis")
 
     input_data_file_label <- tklabel(tt, text = "Input Data File :")
-    input_data_file_entry <- tkentry(tt, textvariable = input_data_file, width = box_length)
+    input_data_file_entry <- tkentry(tt, textvariable = input_data_file,
+                                     width = box_length)
     input_data_file_button <- tkbutton(tt, text = " Select... ",
-                                       width = bt_width, command = reset_input_data_file)
+                                       width = bt_width,
+                                       command = reset_input_data_file)
 
     project_name_label <- tklabel(tt, text = "Project Name :")
-    project_name_entry <- tkentry(tt, textvariable = project_name, width = box_length)
+    project_name_entry <- tkentry(tt, textvariable = project_name,
+                                  width = box_length)
 
-    preliminary_sort_method_label <- tklabel(tt, text = "Preliminary Sorting :")
+    preliminary_sort_method_label <- tklabel(tt,
+                                             text = "Preliminary Sorting :")
     preliminary_sort_method_combo <- ttkcombobox(tt, values = sort_options,
                                                  textvariable = preliminary_sort_method,
-                                                 state="readonly", width = box_length-2)
+                                                 state="readonly",
+                                                 width = box_length-2)
     preliminary_sort_method_button <- tkbutton(tt, text = " Parameter ",
                                        width = bt_width,
                                        command = reset_preliminary_sort_parameter)
@@ -222,15 +248,18 @@ uSORT_parameters_GUI <- function(){
     refine_sort_method_label <- tklabel(tt, text = "Refine Sorting :")
     refine_sort_method_combo <- ttkcombobox(tt, values = sort_options,
                                             textvariable = refine_sort_method,
-                                            state="readonly", width = box_length-2)
+                                            state="readonly",
+                                            width = box_length-2)
     refine_sort_method_button <- tkbutton(tt, text = " Parameter ",
                                           width = bt_width,
                                           command = reset_refine_sort_parameter)
 
     result_directory_label <- tklabel(tt, text = "Result Directory :")
-    result_directory_entry <- tkentry(tt, textvariable = result_directory, width = box_length)
+    result_directory_entry <- tkentry(tt, textvariable = result_directory,
+                                      width = box_length)
     result_directory_button <- tkbutton(tt, text = " Choose... ",
-                                        width = bt_width, command = reset_result_directory)
+                                        width = bt_width,
+                                        command = reset_result_directory)
 
     quit_button <- tkbutton(tt, text = "Quit", command = quit)
     reset_button <- tkbutton(tt, text = "Reset", command = reset)
@@ -244,7 +273,8 @@ uSORT_parameters_GUI <- function(){
 
     tkgrid(preliminary_sort_method_label, preliminary_sort_method_combo,
            preliminary_sort_method_button, padx = cell_width)
-    tkgrid.configure(preliminary_sort_method_label, preliminary_sort_method_combo,
+    tkgrid.configure(preliminary_sort_method_label,
+                     preliminary_sort_method_combo,
                      preliminary_sort_method_button, sticky = "e")
 
     tkgrid(refine_sort_method_label, refine_sort_method_combo,
@@ -313,9 +343,10 @@ uSORT_parameters_GUI <- function(){
 #' @return a list of parameters.
 #'
 #' @author Hao Chen
-sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
-                                                      "monocle", "Wanderlust",
-                                                      "SPIN", "none")){
+sorting_method_parameter_GUI <- function(
+    method = c("autoSPIN", "sWanderlust",
+               "monocle", "Wanderlust",
+               "SPIN", "none")){
     method <- match.arg(method)
     data_type_options <- c("linear", "cyclical")
     SPIN_options <- c("STS", "neighborhood")
@@ -356,26 +387,42 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
 
                data_type_label <- tklabel(tt, text = "data type :")
                data_type_rbuts <- tkframe(tt)
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[1],
-                                    variable = data_type, value = data_type_options[1]), side = "left")
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[2],
-                                    variable = data_type, value = data_type_options[2]), side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[1],
+                                    variable = data_type,
+                                    value = data_type_options[1]),
+                      side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[2],
+                                    variable = data_type,
+                                    value = data_type_options[2]),
+                      side = "left")
 
                method_label <- tklabel(tt, text = "sorting method :")
                method_rbuts <- tkframe(tt)
                tkpack(tkradiobutton(method_rbuts, text = SPIN_options[1],
-                                    variable = SPIN_option, value = SPIN_options[1]), side = "left")
+                                    variable = SPIN_option,
+                                    value = SPIN_options[1]),
+                      side = "left")
                tkpack(tkradiobutton(method_rbuts, text = SPIN_options[2],
-                                    variable = SPIN_option, value = SPIN_options[2]), side = "left")
+                                    variable = SPIN_option,
+                                    value = SPIN_options[2]),
+                      side = "left")
 
                alpha_label <- tklabel(tt, text = "alpha :")
-               alpha_entry <- tkentry(tt, textvariable = autoSPIN_alpha, width = box_length)
+               alpha_entry <- tkentry(tt, textvariable = autoSPIN_alpha,
+                                      width = box_length)
 
                sigma_width_label <- tklabel(tt, text = "sigma width :")
-               sigma_width_entry <- tkentry(tt, textvariable = SPIN_sigma_width, width = box_length)
+               sigma_width_entry <- tkentry(tt,
+                                            textvariable = SPIN_sigma_width,
+                                            width = box_length)
 
-               no_randomization_label <- tklabel(tt, text = "no. randomization :")
-               no_randomization_entry <- tkentry(tt, textvariable = autoSPIN_randomization, width = box_length)
+               no_randomization_label <- tklabel(tt,
+                                                 text = "no. randomization :")
+               no_randomization_entry <- tkentry(tt,
+                                                 textvariable=autoSPIN_randomization,
+                                                 width = box_length)
 
                reset_button <- tkbutton(tt, text = "Reset", command = reset)
                ok_button <- tkbutton(tt, text = "OK", command = ok)
@@ -391,11 +438,15 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
                tkgrid(alpha_label, alpha_entry, padx = cell_width)
                tkgrid.configure(alpha_label, alpha_entry, sticky = "e")
 
-               tkgrid(sigma_width_label, sigma_width_entry, padx = cell_width)
-               tkgrid.configure(sigma_width_label, sigma_width_entry, sticky = "e")
+               tkgrid(sigma_width_label, sigma_width_entry,
+                      padx = cell_width)
+               tkgrid.configure(sigma_width_label, sigma_width_entry,
+                                sticky = "e")
 
-               tkgrid(no_randomization_label, no_randomization_entry, padx = cell_width)
-               tkgrid.configure(no_randomization_label, no_randomization_entry, sticky = "e")
+               tkgrid(no_randomization_label, no_randomization_entry,
+                      padx = cell_width)
+               tkgrid.configure(no_randomization_label,
+                                no_randomization_entry, sticky = "e")
 
                tkgrid(reset_button, ok_button, padx = cell_width)
                tkgrid.configure(reset_button, sticky = "e")
@@ -424,41 +475,69 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
 
                data_type_label <- tklabel(tt, text = "data type :")
                data_type_rbuts <- tkframe(tt)
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[1],
-                                    variable = data_type, value = data_type_options[1]), side = "left")
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[2],
-                                    variable = data_type, value = data_type_options[2]), side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[1],
+                                    variable = data_type,
+                                    value = data_type_options[1]),
+                      side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[2],
+                                    variable = data_type,
+                                    value = data_type_options[2]),
+                      side = "left")
 
                method_label <- tklabel(tt, text = "sorting method :")
                method_rbuts <- tkframe(tt)
-               tkpack(tkradiobutton(method_rbuts, text = SPIN_options[1],
-                                    variable = SPIN_option, value = SPIN_options[1]), side = "left")
-               tkpack(tkradiobutton(method_rbuts, text = SPIN_options[2],
-                                    variable = SPIN_option, value = SPIN_options[2]), side = "left")
+               tkpack(tkradiobutton(method_rbuts,
+                                    text = SPIN_options[1],
+                                    variable = SPIN_option,
+                                    value = SPIN_options[1]),
+                      side = "left")
+               tkpack(tkradiobutton(method_rbuts,
+                                    text = SPIN_options[2],
+                                    variable = SPIN_option,
+                                    value = SPIN_options[2]),
+                      side = "left")
 
                alpha_label <- tklabel(tt, text = "alpha :")
-               alpha_entry <- tkentry(tt, textvariable = autoSPIN_alpha, width = box_length)
+               alpha_entry <- tkentry(tt, textvariable = autoSPIN_alpha,
+                                      width = box_length)
 
                sigma_width_label <- tklabel(tt, text = "sigma width :")
-               sigma_width_entry <- tkentry(tt, textvariable = SPIN_sigma_width, width = box_length)
+               sigma_width_entry <- tkentry(tt,
+                                            textvariable = SPIN_sigma_width,
+                                            width = box_length)
 
-               dfmap_components_label <- tklabel(tt, text = "diffusionmap components :")
-               dfmap_components_entry <- tkentry(tt, textvariable = wanderlust_dfmap_components, width = box_length)
+               dfmap_components_label <- tklabel(tt,
+                                                 text = "diffusionmap components :")
+               dfmap_components_entry <- tkentry(tt,
+                                                 textvariable = wanderlust_dfmap_components,
+                                                 width = box_length)
 
                l_label <- tklabel(tt, text = "no. nearest neighbors :")
-               l_entry <- tkentry(tt, textvariable = wanderlust_l, width = box_length)
+               l_entry <- tkentry(tt, textvariable = wanderlust_l,
+                                  width = box_length)
 
                num_waypoints_label <- tklabel(tt, text = "no. waypoints :")
-               num_waypoints_entry <- tkentry(tt, textvariable = wanderlust_num_waypoints, width = box_length)
+               num_waypoints_entry <- tkentry(tt,
+                                              textvariable = wanderlust_num_waypoints,
+                                              width = box_length)
 
                waypoints_seed_label <- tklabel(tt, text = "waypoints seed :")
-               waypoints_seed_entry <- tkentry(tt, textvariable = wanderlust_waypoints_seed, width = box_length)
+               waypoints_seed_entry <- tkentry(tt,
+                                               textvariable = wanderlust_waypoints_seed,
+                                               width = box_length)
 
-               flock_waypoints_label <- tklabel(tt, text = "flock waypoints :")
-               flock_waypoints_entry <- tkentry(tt, textvariable = wanderlust_flock_waypoints, width = box_length)
+               flock_waypoints_label <- tklabel(tt,
+                                                text = "flock waypoints :")
+               flock_waypoints_entry <- tkentry(tt,
+                                                textvariable = wanderlust_flock_waypoints,
+                                                width = box_length)
 
-               reset_button <- tkbutton(tt, text = "Reset", command = reset)
-               ok_button <- tkbutton(tt, text = "OK", command = ok)
+               reset_button <- tkbutton(tt, text = "Reset",
+                                        command = reset)
+               ok_button <- tkbutton(tt, text = "OK",
+                                     command = ok)
 
                tkgrid(data_type_label, data_type_rbuts, padx = cell_width)
                tkgrid.configure(data_type_label, sticky = "e")
@@ -471,23 +550,33 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
                tkgrid(alpha_label, alpha_entry, padx = cell_width)
                tkgrid.configure(alpha_label, alpha_entry, sticky = "e")
 
-               tkgrid(sigma_width_label, sigma_width_entry, padx = cell_width)
-               tkgrid.configure(sigma_width_label, sigma_width_entry, sticky = "e")
+               tkgrid(sigma_width_label, sigma_width_entry,
+                      padx = cell_width)
+               tkgrid.configure(sigma_width_label, sigma_width_entry,
+                                sticky = "e")
 
-               tkgrid(dfmap_components_label, dfmap_components_entry, padx = cell_width)
-               tkgrid.configure(dfmap_components_label, dfmap_components_entry, sticky = "e")
+               tkgrid(dfmap_components_label, dfmap_components_entry,
+                      padx = cell_width)
+               tkgrid.configure(dfmap_components_label,
+                                dfmap_components_entry, sticky = "e")
 
                tkgrid(l_label, l_entry, padx = cell_width)
                tkgrid.configure(l_label, l_entry, sticky = "e")
 
-               tkgrid(num_waypoints_label, num_waypoints_entry, padx = cell_width)
-               tkgrid.configure(num_waypoints_label, num_waypoints_entry, sticky = "e")
+               tkgrid(num_waypoints_label, num_waypoints_entry,
+                      padx = cell_width)
+               tkgrid.configure(num_waypoints_label, num_waypoints_entry,
+                                sticky = "e")
 
-               tkgrid(waypoints_seed_label, waypoints_seed_entry, padx = cell_width)
-               tkgrid.configure(waypoints_seed_label, waypoints_seed_entry, sticky = "e")
+               tkgrid(waypoints_seed_label, waypoints_seed_entry,
+                      padx = cell_width)
+               tkgrid.configure(waypoints_seed_label, waypoints_seed_entry,
+                                sticky = "e")
 
-               tkgrid(flock_waypoints_label, flock_waypoints_entry, padx = cell_width)
-               tkgrid.configure(flock_waypoints_label, flock_waypoints_entry, sticky = "e")
+               tkgrid(flock_waypoints_label, flock_waypoints_entry,
+                      padx = cell_width)
+               tkgrid.configure(flock_waypoints_label,
+                                flock_waypoints_entry, sticky = "e")
 
                tkgrid(reset_button, ok_button, padx = cell_width)
                tkgrid.configure(reset_button, sticky = "e")
@@ -518,53 +607,85 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
 
                data_type_label <- tklabel(tt, text = "data type :")
                data_type_rbuts <- tkframe(tt)
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[1],
-                                    variable = data_type, value = data_type_options[1]), side = "left")
-               tkpack(tkradiobutton(data_type_rbuts, text = data_type_options[2],
-                                    variable = data_type, value = data_type_options[2]), side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[1],
+                                    variable = data_type,
+                                    value = data_type_options[1]),
+                      side = "left")
+               tkpack(tkradiobutton(data_type_rbuts,
+                                    text = data_type_options[2],
+                                    variable = data_type,
+                                    value = data_type_options[2]),
+                      side = "left")
 
                start_cell_label <- tklabel(tt, text = "start cell :")
-               start_cell_entry <- tkentry(tt, textvariable = wanderlust_start_cell, width = box_length)
+               start_cell_entry <- tkentry(tt,
+                                           textvariable = wanderlust_start_cell,
+                                           width = box_length)
 
-               dfmap_components_label <- tklabel(tt, text = "diffusionmap components :")
-               dfmap_components_entry <- tkentry(tt, textvariable = wanderlust_dfmap_components, width = box_length)
+               dfmap_components_label <- tklabel(tt,
+                                                 text = "diffusionmap components :")
+               dfmap_components_entry <- tkentry(tt,
+                                                 textvariable = wanderlust_dfmap_components,
+                                                 width = box_length)
 
                l_label <- tklabel(tt, text = "no. nearest neighbors :")
-               l_entry <- tkentry(tt, textvariable = wanderlust_l, width = box_length)
+               l_entry <- tkentry(tt, textvariable = wanderlust_l,
+                                  width = box_length)
 
                num_waypoints_label <- tklabel(tt, text = "no. waypoints :")
-               num_waypoints_entry <- tkentry(tt, textvariable = wanderlust_num_waypoints, width = box_length)
+               num_waypoints_entry <- tkentry(tt,
+                                              textvariable = wanderlust_num_waypoints,
+                                              width = box_length)
 
-               waypoints_seed_label <- tklabel(tt, text = "waypoints seed :")
-               waypoints_seed_entry <- tkentry(tt, textvariable = wanderlust_waypoints_seed, width = box_length)
+               waypoints_seed_label <- tklabel(tt,
+                                               text = "waypoints seed :")
+               waypoints_seed_entry <- tkentry(tt,
+                                               textvariable = wanderlust_waypoints_seed,
+                                               width = box_length)
 
-               flock_waypoints_label <- tklabel(tt, text = "flock waypoints :")
-               flock_waypoints_entry <- tkentry(tt, textvariable = wanderlust_flock_waypoints, width = box_length)
+               flock_waypoints_label <- tklabel(tt,
+                                                text = "flock waypoints :")
+               flock_waypoints_entry <- tkentry(tt,
+                                                textvariable = wanderlust_flock_waypoints,
+                                                width = box_length)
 
-               reset_button <- tkbutton(tt, text = "Reset", command = reset)
-               ok_button <- tkbutton(tt, text = "OK", command = ok)
+               reset_button <- tkbutton(tt, text = "Reset",
+                                        command = reset)
+               ok_button <- tkbutton(tt, text = "OK",
+                                     command = ok)
 
-               tkgrid(data_type_label, data_type_rbuts, padx = cell_width)
+               tkgrid(data_type_label, data_type_rbuts,
+                      padx = cell_width)
                tkgrid.configure(data_type_label, sticky = "e")
                tkgrid.configure(data_type_rbuts, sticky = "w")
 
                tkgrid(start_cell_label, start_cell_entry, padx = cell_width)
-               tkgrid.configure(start_cell_label, start_cell_entry, sticky = "e")
+               tkgrid.configure(start_cell_label, start_cell_entry,
+                                sticky = "e")
 
-               tkgrid(dfmap_components_label, dfmap_components_entry, padx = cell_width)
-               tkgrid.configure(dfmap_components_label, dfmap_components_entry, sticky = "e")
+               tkgrid(dfmap_components_label, dfmap_components_entry,
+                      padx = cell_width)
+               tkgrid.configure(dfmap_components_label,
+                                dfmap_components_entry, sticky = "e")
 
                tkgrid(l_label, l_entry, padx = cell_width)
                tkgrid.configure(l_label, l_entry, sticky = "e")
 
-               tkgrid(num_waypoints_label, num_waypoints_entry, padx = cell_width)
-               tkgrid.configure(num_waypoints_label, num_waypoints_entry, sticky = "e")
+               tkgrid(num_waypoints_label, num_waypoints_entry,
+                      padx = cell_width)
+               tkgrid.configure(num_waypoints_label,
+                                num_waypoints_entry, sticky = "e")
 
-               tkgrid(waypoints_seed_label, waypoints_seed_entry, padx = cell_width)
-               tkgrid.configure(waypoints_seed_label, waypoints_seed_entry, sticky = "e")
+               tkgrid(waypoints_seed_label, waypoints_seed_entry,
+                      padx = cell_width)
+               tkgrid.configure(waypoints_seed_label, waypoints_seed_entry,
+                                sticky = "e")
 
-               tkgrid(flock_waypoints_label, flock_waypoints_entry, padx = cell_width)
-               tkgrid.configure(flock_waypoints_label, flock_waypoints_entry, sticky = "e")
+               tkgrid(flock_waypoints_label, flock_waypoints_entry,
+                      padx = cell_width)
+               tkgrid.configure(flock_waypoints_label,
+                                flock_waypoints_entry, sticky = "e")
 
                tkgrid(reset_button, ok_button, padx = cell_width)
                tkgrid.configure(reset_button, sticky = "e")
@@ -588,12 +709,18 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
                method_label <- tklabel(tt, text = "sorting method :")
                method_rbuts <- tkframe(tt)
                tkpack(tkradiobutton(method_rbuts, text = SPIN_options[1],
-                                    variable = SPIN_option, value = SPIN_options[1]), side = "left")
+                                    variable = SPIN_option,
+                                    value = SPIN_options[1]),
+                      side = "left")
                tkpack(tkradiobutton(method_rbuts, text = SPIN_options[2],
-                                    variable = SPIN_option, value = SPIN_options[2]), side = "left")
+                                    variable = SPIN_option,
+                                    value = SPIN_options[2]),
+                      side = "left")
 
                sigma_width_label <- tklabel(tt, text = "sigma width :")
-               sigma_width_entry <- tkentry(tt, textvariable = SPIN_sigma_width, width = box_length)
+               sigma_width_entry <- tkentry(tt,
+                                            textvariable = SPIN_sigma_width,
+                                            width = box_length)
 
                reset_button <- tkbutton(tt, text = "Reset", command = reset)
                ok_button <- tkbutton(tt, text = "OK", command = ok)
@@ -602,8 +729,10 @@ sorting_method_parameter_GUI <- function(method = c("autoSPIN", "sWanderlust",
                tkgrid.configure(method_label, sticky = "e")
                tkgrid.configure(method_rbuts, sticky = "w")
 
-               tkgrid(sigma_width_label, sigma_width_entry, padx = cell_width)
-               tkgrid.configure(sigma_width_label, sigma_width_entry, sticky = "e")
+               tkgrid(sigma_width_label, sigma_width_entry,
+                      padx = cell_width)
+               tkgrid.configure(sigma_width_label, sigma_width_entry,
+                                sticky = "e")
 
                tkgrid(reset_button, ok_button, padx = cell_width)
                tkgrid.configure(reset_button, sticky = "e")
