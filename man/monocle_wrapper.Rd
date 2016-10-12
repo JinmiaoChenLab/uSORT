@@ -26,9 +26,9 @@ da <- iris[sample(150, 150, replace = FALSE), ]
 rownames(da) <- paste0('spl_',seq(1,nrow(da)))
 d <- da[,1:4]
 dl <- da[,5,drop=FALSE]
-res <- monocle_wrapper(log2_exp = d, expression_data_raw = d)
-dl <- dl[match(res,rownames(dl)),]
-annot <- data.frame(id = seq(1,length(res)), label=dl, stringsAsFactors = FALSE)
+#res <- monocle_wrapper(log2_exp = d, expression_data_raw = d)
+#dl <- dl[match(res,rownames(dl)),]
+#annot <- data.frame(id = seq(1,length(res)), label=dl, stringsAsFactors = FALSE)
 #ggplot(annot, aes(x=id, y=id, colour = label)) + geom_point() + theme_bw()
 }
 

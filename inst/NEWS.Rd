@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package \pkg{uSORT}}
 
+\section{Changes in version 0.99.4(2016-10-12)}{
+  \subsection{MODIFICATION}{
+    \itemize{
+      \item commented some example codes for monocle_wrapper due to some unknown error.
+    }
+  }
+}
+
 \section{Changes in version 0.99.2(2016-09-13)}{
   \subsection{MODIFICATION}{
     \itemize{
